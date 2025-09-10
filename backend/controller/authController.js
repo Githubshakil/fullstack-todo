@@ -17,8 +17,10 @@ let registrationController = async (req, res) => {
   const { username, email, password } = req.body;
 
   const hashed = await bcrypt.hash(password, 10);
-  console.log(hashed);
+  
 };
+
+
 let loginController = (req, res) => {
   res.send("ami login");
 };
