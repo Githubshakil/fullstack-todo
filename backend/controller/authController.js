@@ -2,6 +2,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const User = require("../model/userModel.js");
 const nodemailer = require("nodemailer");
+const { use } = require("react");
 
 
 const pattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -59,10 +60,10 @@ if (errors.uasenameError||errors.emailError||errors.passwordError) {
 
 
 
-  const userExits = await User.findOne({ email: email });
+  const userExists = await User.findOne({ email: email });
   // console.log(userExits)
 
-  if (userExits) {
+  if (userExists) {
     return res.send({ error: `${email} already exits` });
   }
 
@@ -109,8 +110,46 @@ let verifyTokenController = async (req,res) =>{
   }
 }
 
-let loginController = (req, res) => {
- 
+let loginController =async (req, res) => {
+  const {email, password} = req.body
+  const userExists = await User.findOne({email})
+  if (!userExists) {
+    return res.send({error: "Invalid credencial"})
+  }
+  if (!userExists.isVerified) {
+    return res.send({error: "please verify your email for login"})
+  }
+  const isPasswordMatch = await bcrypt.compare(password,userExists.password)
+  if (!isPasswordMatch) {
+    return res.send({error:"Invalid credencial"})
+  }
+
+
+  const accessToken = generateAccessToken(userExists)
+  const refreshToken = generateRefreshToken(userExists)
+
+  userExists.refreshToken = refreshToken
+
+  await userExists.save()
+
+  res.cookie("refreshToken", refreshToken,{
+    httpOnly: true,
+    secure: false,
+    sameSite: "strict",
+    maxAge: 365 * 24 * 60* 60* 1000 // 1year validation
+    
+  })
+  res.send({
+    massage: "Logine Successfull",
+    accessToken: accessToken,
+    username: userExists.username,
+    email: userExists.email
+  })
 };
 
-module.exports = { registrationController, loginController, verifyTokenController };
+
+const refreshController =  ()=>{
+  console.log("ami refresh")
+}
+
+module.exports = { registrationController, loginController, verifyTokenController,refreshController };
