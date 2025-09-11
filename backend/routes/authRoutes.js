@@ -9,7 +9,7 @@ const {
   resetPasswordController
   
 } = require("../controller/authController");
-
+  // registration route
 router.post("/registration", registrationController);
 router.post("/verify/:token", verifyTokenController);
 
