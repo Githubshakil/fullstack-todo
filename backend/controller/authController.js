@@ -2,10 +2,13 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const User = require("../model/userModel.js");
 const nodemailer = require("nodemailer");
-const { use } = require("react");
 
 
+// email velidation pattern
 const pattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+
+// nodemailer transporter
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -14,18 +17,24 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+
+// generate token
 const generateAccessToken = (user) => {
   return jwt.sign({ id: user._id }, process.env.ACCESS_SCRECT, {
     expiresIn: "15m",
   });
 };
 
+
+// generate refresh token
 const generateRefreshToken = (user) => {
   return jwt.sign({ id: user._id }, process.env.REFRESH_TOKEN, {
     expiresIn: "365d",
   });
 };
 
+
+// registration controller
 let registrationController = async (req, res) => {
   const { username, email, password } = req.body;
 
@@ -56,10 +65,8 @@ if (errors.uasenameError||errors.emailError||errors.passwordError) {
 }
 
   // username email password end velidation
-
-
-
-
+  // check user already exits or not
+   
   const userExists = await User.findOne({ email: email });
   // console.log(userExits)
 
@@ -92,7 +99,7 @@ if (errors.uasenameError||errors.emailError||errors.passwordError) {
   }
 };
 
-
+// verify email controller
 let verifyTokenController = async (req,res) =>{
    const {token} = req.params
   try {
@@ -110,6 +117,8 @@ let verifyTokenController = async (req,res) =>{
   }
 }
 
+// login controller
+
 let loginController =async (req, res) => {
   const {email, password} = req.body
   const userExists = await User.findOne({email})
@@ -124,13 +133,17 @@ let loginController =async (req, res) => {
     return res.send({error:"Invalid credencial"})
   }
 
-
+// generate token
   const accessToken = generateAccessToken(userExists)
   const refreshToken = generateRefreshToken(userExists)
-
+// store refresh token in database
   userExists.refreshToken = refreshToken
 
   await userExists.save()
+
+  
+// store refresh token in cookie
+
 
   res.cookie("refreshToken", refreshToken,{
     httpOnly: true,
@@ -147,9 +160,68 @@ let loginController =async (req, res) => {
   })
 };
 
+// refresh token controller
+const refreshController = async (req,res)=>{
+  const token = req.cookies.refreshToken
+  if (!token) {
+    res.send({error: "No token found"})
+  }
+  const userExists = await User.findOne({refreshToken : token})
+  if (!userExists) {
+    return res.send({error: "Invalid Token"})
+  }
 
-const refreshController =  ()=>{
-  console.log("ami refresh")
+  jwt.verify(token,  process.env.REFRESH_TOKEN, (err,decoded)=>{
+    if (err) {
+      return res.send({error: "Invalid token"})
+    }
+    const accessToken = generateAccessToken(userExists)
+    res.send({accessToken})
+  })
+
+}
+// forgot password controller
+
+const forgotPasswordController = async (req,res) =>{
+  const {email} = req.body
+  const userExists = await User.findOne({email})
+  if (!userExists) {
+    return res.send({error: "User not found"})
+  }
+  try {
+    const resetToken = jwt.sign({ id: userExists._id }, process.env.ACCESS_SCRECT, {expiresIn: "15m"});
+  const resetLink =`${process.env.CLINT_URL}/reset-password/${resetToken}`
+     await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: user.email,
+      subject: `Reset Password`,
+      html: `<h3>click to Reset Password <a href='${resetLink}'>Reset Password</a></h3>`
+    })
+
+    res.send({massage: "Please check email for reset password"})
+  } catch (error) {
+    console.log("while sending reset password email ", error);
+    res.send({error: "Something went wrong"}) 
+  }
 }
 
-module.exports = { registrationController, loginController, verifyTokenController,refreshController };
+
+// reset password controller
+const resetPasswordController = async (req,res) =>{
+ const {token} = req.params
+  const {password} = req.body
+  try {
+    const decoded = jwt.verify(token, process.env.ACCESS_SCRECT)
+    const userExists = await User.findById(decoded.id)
+    if (!userExists) {
+      return res.send({error: "User not found"})
+    }
+    userExists.password = await bcrypt.hash(password, 10)
+    await userExists.save()
+    res.send({message: "Password reset successfully"})
+  } catch (error) {
+    res.send({error: "Invalid Token or expired"})
+  }
+}
+
+module.exports = { registrationController, loginController, verifyTokenController,refreshController,forgotPasswordController,resetPasswordController };
