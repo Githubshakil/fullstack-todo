@@ -11,7 +11,7 @@ const {
 } = require("../controller/authController");
   // registration route
 router.post("/registration", registrationController);
-router.post("/verify/:token", verifyTokenController);
+router.get("/verify/:token", verifyTokenController);
 
 router.post("/login", loginController);
 router.post("/refresh", refreshController);
