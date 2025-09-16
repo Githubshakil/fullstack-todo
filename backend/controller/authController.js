@@ -39,11 +39,11 @@ let registrationController = async (req, res) => {
   const { username, email, password } = req.body;
 
   let errors = {
-    uasenameError: "",
+    usernameError: "",
     emailError: "",
-    passwordError:"",
-    
+    passwordError: "",
   }
+  
 
   // username email password start velidation
   if (!username) {
@@ -64,6 +64,8 @@ if (errors.uasenameError||errors.emailError||errors.passwordError) {
   res.send({errors})
 }
 
+
+
   // username email password end velidation
   // check user already exits or not
    
@@ -73,6 +75,7 @@ if (errors.uasenameError||errors.emailError||errors.passwordError) {
   if (userExists) {
     return res.send({ error: `${email} already exits` });
   }
+  // hash password
 
   const hashed = await bcrypt.hash(password, 10);
 
@@ -87,7 +90,7 @@ if (errors.uasenameError||errors.emailError||errors.passwordError) {
     await user.save();
     const verificationToken = jwt.sign({ id: user._id },process.env.ACCESS_SCRECT,{expiresIn: "1d",});
     const verifylink = `${process.env.CLINT_URL}/verify/${verificationToken}`
-    await transporter.sendMail({
+    transporter.sendMail({
       from: process.env.EMAIL_USER,
       to: user.email,
       subject: `${user.username} please verify your email`,

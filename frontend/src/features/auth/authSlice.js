@@ -9,7 +9,7 @@ export const registration = createAsyncThunk(
       const res = await authApi.registration(data);
       return res.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error);
     }
   }
 );
@@ -111,7 +111,7 @@ export const authSlice = createSlice({
         })
         .addCase(registration.rejected,(state,action)=>{
             state.loading = false
-            state.error = action.payload.error
+           
         })
         // verify email
         .addCase(verifyEmail.fulfilled,(state,action)=>{
