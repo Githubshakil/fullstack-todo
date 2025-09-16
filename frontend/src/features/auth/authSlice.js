@@ -90,6 +90,7 @@ export const authSlice = createSlice({
       })
       .addCase(login.fulfilled, (state, action) => {
         state.loading = false;
+
         state.user = {
           email: action.payload.email,
           username: action.payload.username,
@@ -101,45 +102,44 @@ export const authSlice = createSlice({
         state.error = action.payload.error;
       })
 
-        // registration
-        .addCase(registration.fulfilled,(state,action)=>{
-            state.message = action.payload.message
-            state.loading = false
-        })
-        .addCase(registration.pending,(state,action)=>{
-            state.loading = true
-        })
-        .addCase(registration.rejected,(state,action)=>{
-            state.loading = false
-           
-        })
-        // verify email
-        .addCase(verifyEmail.fulfilled,(state,action)=>{
-            state.message = action.payload.message
-            state.loading = false
-        })
-        .addCase(verifyEmail.pending,(state,action)=>{
-            state.loading = true
-        })
-        .addCase(verifyEmail.rejected,(state,action)=>{
-            state.loading = false
-            state.error = action.payload.error
-        })  
-        // forgot password
-        .addCase(forgotPassword.fulfilled,(state,action)=>{
-            state.message = action.payload.message
-            state.loading = false
-        })
-        .addCase(forgotPassword.pending,(state,action)=>{
-            state.loading = true
-        })
-        .addCase(forgotPassword.rejected,(state,action)=>{
-            state.loading = false
-            state.error = action.payload.error
-        })
+      // registration
+      .addCase(registration.fulfilled, (state, action) => {
+        state.message = action.payload.message;
+        state.loading = false;
+      })
+      .addCase(registration.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(registration.rejected, (state, action) => {
+        state.loading = false;
+      })
+      // verify email
+      .addCase(verifyEmail.fulfilled, (state, action) => {
+        state.message = action.payload.message;
+        state.loading = false;
+      })
+      .addCase(verifyEmail.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(verifyEmail.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload.error;
+      })
+      // forgot password
+      .addCase(forgotPassword.fulfilled, (state, action) => {
+        state.message = action.payload.message;
+        state.loading = false;
+      })
+      .addCase(forgotPassword.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(forgotPassword.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload.error;
+      });
   },
 });
 
-export const {logout} = authSlice.actions;
+export const { logout } = authSlice.actions;
 
 export default authSlice.reducer;

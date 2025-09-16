@@ -5,25 +5,33 @@ import { login } from '../features/auth/authSlice';
 const Login = () => {
 
   const [formData, setFormData] = useState({
-    username: "",
+    
     email: "",
     password: "",
   });
   const dispatch = useDispatch();
-  const { loading,message, error } = useSelector((state) => state.auth);
+  const { message, error, loading } = useSelector((state) => state.auth);
+  console.log(message);
+  console.log(error);
+  console.log(loading);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = () => {
     dispatch(login(formData));
   };
 
   return (
     <div>
       <h1>Login</h1>
-      <input type="text" placeholder='Username' onChange={(e)=> setFormData({...formData,username: e.target.value})} />
+     
       <input type="email" placeholder='Email' onChange={(e)=> setFormData({...formData,email: e.target.value})} />
       <input type="password" placeholder='Password' onChange={(e)=> setFormData({...formData,password: e.target.value})} />
+      {loading 
+      ?
+      <button>Loading......</button>
+      :
+
       <button onClick={handleSubmit}>Submit</button>
+}
       
     </div>
   )
