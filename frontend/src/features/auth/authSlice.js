@@ -35,7 +35,7 @@ export const verifyEmail = createAsyncThunk(
       const res = await authApi.verifyEmail(data);
       return res.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error);
     }
   }
 );
@@ -48,7 +48,7 @@ export const forgotPassword = createAsyncThunk(
       const res = await authApi.forgotPassword(data);
       return res.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error);
     }
   }
 );
@@ -56,12 +56,12 @@ export const forgotPassword = createAsyncThunk(
 // Reset password
 export const resetPassword = createAsyncThunk(
   "auth/resetPassword",
-  async ({ token, data }, { rejectWithValue }) => {
+  async ({ token, from }, { rejectWithValue }) => {
     try {
-      const res = await authApi.resetPassword(token, data);
+      const res = await authApi.resetPassword(token,{password:from.password});
       return res.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error);
     }
   }
 );
@@ -116,7 +116,6 @@ export const authSlice = createSlice({
       // verify email
       .addCase(verifyEmail.fulfilled, (state, action) => {
         state.message = action.payload.message;
-        state.loading = false;
       })
       .addCase(verifyEmail.pending, (state, action) => {
         state.loading = true;

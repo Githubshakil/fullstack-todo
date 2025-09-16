@@ -20,9 +20,9 @@ const Registration = () => {
   return (
     <div>
       <h2>Registration</h2>
-      <input type="text" onChange={(e)=> setFormData({...formData,username: e.target.value})} />
-      <input type="email" onChange={(e)=> setFormData({...formData,email: e.target.value})} />
-      <input type="password" onChange={(e)=> setFormData({...formData,password: e.target.value})} />
+      <input type="text" placeholder='Username' onChange={(e)=> setFormData({...formData,username: e.target.value})} />
+      <input type="email" placeholder='Email' onChange={(e)=> setFormData({...formData,email: e.target.value})} />
+      <input type="password" placeholder='Password' onChange={(e)=> setFormData({...formData,password: e.target.value})} />
       <button onClick={handleSubmit}>Submit</button>
     </div>
   )

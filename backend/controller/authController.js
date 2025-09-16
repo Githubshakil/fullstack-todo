@@ -196,7 +196,7 @@ const forgotPasswordController = async (req,res) =>{
   const resetLink =`${process.env.CLINT_URL}/reset-password/${resetToken}`
      await transporter.sendMail({
       from: process.env.EMAIL_USER,
-      to: user.email,
+      to: userExists.email,
       subject: `Reset Password`,
       html: `<h3>click to Reset Password <a href='${resetLink}'>Reset Password</a></h3>`
     })
