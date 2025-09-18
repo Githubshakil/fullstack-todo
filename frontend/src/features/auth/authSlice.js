@@ -9,7 +9,7 @@ export const registration = createAsyncThunk(
       const res = await authApi.registration(data);
       return res.data;
     } catch (error) {
-      return rejectWithValue(error);
+      return rejectWithValue(error.response?.data?.error || error.message || "Registration failed");
     }
   }
 );
@@ -35,7 +35,7 @@ export const verifyEmail = createAsyncThunk(
       const res = await authApi.verifyEmail(data);
       return res.data;
     } catch (error) {
-      return rejectWithValue(error);
+      return rejectWithValue(error.response?.data?.error || error.message || "Email verification failed");
     }
   }
 );
@@ -48,7 +48,7 @@ export const forgotPassword = createAsyncThunk(
       const res = await authApi.forgotPassword(data);
       return res.data;
     } catch (error) {
-      return rejectWithValue(error);
+      return rejectWithValue(error.response?.data?.error || error.message || "Forgot password failed");
     }
   }
 );
@@ -61,7 +61,7 @@ export const resetPassword = createAsyncThunk(
       const res = await authApi.resetPassword(token,{password:from.password});
       return res.data;
     } catch (error) {
-      return rejectWithValue(error);
+      return rejectWithValue(error.response?.data?.error || error.message || "Reset password failed");
     }
   }
 );
@@ -99,7 +99,7 @@ export const authSlice = createSlice({
       })
       .addCase(login.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload.error;
+        state.error = action.payload || "Login failed";
       })
 
       // registration
@@ -112,6 +112,7 @@ export const authSlice = createSlice({
       })
       .addCase(registration.rejected, (state, action) => {
         state.loading = false;
+        state.error = action.payload || "Registration failed";
       })
       // verify email
       .addCase(verifyEmail.fulfilled, (state, action) => {
@@ -122,7 +123,7 @@ export const authSlice = createSlice({
       })
       .addCase(verifyEmail.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload.error;
+        state.error = action.payload || "Email verification failed";
       })
       // forgot password
       .addCase(forgotPassword.fulfilled, (state, action) => {
@@ -134,7 +135,7 @@ export const authSlice = createSlice({
       })
       .addCase(forgotPassword.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload.error;
+        state.error = action.payload || "Forgot password failed";
       });
   },
 });

@@ -10,27 +10,32 @@ const ResetPassword = () => {
   });
 
   const dispatch = useDispatch();
-  const { massage, error } = useSelector((state) => state.auth);
+  const { message, error } = useSelector((state) => state.auth);
 
-  const handleSubmit = () => {
+  const handleSubmit = (e) => {
+    e.preventDefault();
     if (token) {
       dispatch(resetPassword({ token, formData }));
     }
   };
+
   return (
-   
+    <form onSubmit={handleSubmit}>
       <div>
         <h2>Reset password</h2>
         <input
           type="password"
           placeholder="Password"
+          value={formData.password}
           onChange={(e) =>
             setFormData({ ...formData, password: e.target.value })
           }
         />
-        <button onClick={handleSubmit}>Submit</button>
+        <button type="submit">Submit</button>
+        {message && <p>{message}</p>}
+        {error && <p style={{ color: "red" }}>{error}</p>}
       </div>
-    
+    </form>
   );
 };
 
