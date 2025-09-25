@@ -9,7 +9,7 @@ let databaseConfig = () => {
       console.log("Database Connected");
     })
     .catch((err) => {
-      console.log("Database connection error:", err);
+      console.log("Database connection error:" +  err);
     });
 };
 
